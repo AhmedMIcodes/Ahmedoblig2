@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Calculator</title>
+</head>
+
+<body>
+    <label for="variable">Select Variable:</label>
+    <select id="variable">
+        <option value="Kommune">Kommune</option>
+        <option value="Fylke">Fylke</option>
+    </select>
+
+    <!-- Options filled dynamically from API -->
+    <label for="areaType">Select Area Type:</label>
+    <select id="areaType">
+        <option value="municipality">Municipality</option>
+        <option value="county">County</option>
+    </select>
+    <label for="areas">Select Areas:</label>
+    <input type="text" id="areas">
+    <label for="years">Select Years:</label>
+    <input type="text" id="years">
+    <button onclick="getStatistics()">Get Statistics</button>
+
+    <div id="results"></div>
+
+    <script>
+        async function getStatistics() {
+            const variable = document.getElementById('variable').value;
+            const areaType = document.getElementById('areaType').value;
+            const areas = document.getElementById('areas').value.split(',');
+            const years = document.getElementById('years').value.split(',');
+
+            const response = await fetch('http://127.0.0.1:3000/getStatistics', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ variable, areaType, areas, years })
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+            // Display results in a table
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <table>
+                    <tr>
+                        <th>Median</th>
+                        <th>Average</th>
+                        <th>Maximum</th>
+                        <th>Minimum</th>
+                    </tr>
+                    <tr>
+                        <td>${data.median}</td>
+                        <td>${data.average}</td>
+                        <td>${data.max}</td>
+                        <td>${data.min}</td>
+                    </tr>
+                </table>
+            `;
+        }
+    </script>
+</body>
+
+</html>
